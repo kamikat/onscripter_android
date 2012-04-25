@@ -15,6 +15,7 @@ import android.app.ProgressDialog;
 import android.content.res.AssetManager;
 import android.content.res.AssetFileDescriptor;
 import android.content.DialogInterface;
+import android.content.DialogInterface.OnKeyListener;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
@@ -67,14 +68,13 @@ public class ONScripter extends Activity implements AdapterView.OnItemClickListe
 	private byte[] buf = null;
 	private int screen_w, screen_h;
 	private int button_w, button_h;
-	private Button btn1, btn2, btn3, btn4, btn5, btn6;
+	private Button btn1, btn2, btn3, btn4, btn5, btn6, btn7, btn8;
 	private LinearLayout layout  = null;
 	private LinearLayout layout1 = null;
 	private LinearLayout layout2 = null;
 	private LinearLayout layout3 = null;
 	private boolean mIsLandscape = true;
 	private boolean mButtonVisible = true;
-	private boolean mScreenCentered = false;
 
     static class FileSort implements Comparator<File>{
         public int compare(File src, File target){
@@ -199,6 +199,13 @@ public class ONScripter extends Activity implements AdapterView.OnItemClickListe
 			progDialog = new ProgressDialog(this);
 			progDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
 			progDialog.setMessage("Downloading archives from Internet:");
+			progDialog.setOnKeyListener(new OnKeyListener(){
+				public boolean onKey(DialogInterface dialog, int keyCode, KeyEvent event){
+						if (KeyEvent.KEYCODE_SEARCH == keyCode || KeyEvent.KEYCODE_BACK == keyCode)
+								return true;
+						return false;
+				}
+			});
 			progDialog.show();
 
 			PowerManager pm = (PowerManager) getSystemService(Context.POWER_SERVICE);
@@ -268,6 +275,13 @@ public class ONScripter extends Activity implements AdapterView.OnItemClickListe
 			progDialog = new ProgressDialog(this);
 			progDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
 			progDialog.setMessage("Copying archives: ");
+			progDialog.setOnKeyListener(new OnKeyListener(){
+				public boolean onKey(DialogInterface dialog, int keyCode, KeyEvent event){
+						if (KeyEvent.KEYCODE_SEARCH == keyCode || KeyEvent.KEYCODE_BACK == keyCode)
+								return true;
+						return false;
+				}
+			});
 			progDialog.show();
 
 			PowerManager pm = (PowerManager) getSystemService(Context.POWER_SERVICE);
@@ -374,12 +388,12 @@ public class ONScripter extends Activity implements AdapterView.OnItemClickListe
 		if (dw * game_height >= dh * game_width){
 			screen_w = (dh*game_width/game_height) & (~0x01); // to be 2 bytes aligned
 			button_w = dw - screen_w;
-			button_h = dh/4;
+			button_h = dh/6;
 		}
 		else{
 			mIsLandscape = false;
 			screen_h = dw*game_height/game_width;
-			button_w = dw/4;
+			button_w = dw/6;
 			button_h = dh - screen_h;
 		}
 
@@ -402,27 +416,45 @@ public class ONScripter extends Activity implements AdapterView.OnItemClickListe
 		});
 
 		btn3 = new Button(this);
-		btn3.setText(getResources().getString(R.string.button_up));
+		btn3.setText(getResources().getString(R.string.button_left));
 		btn3.setOnClickListener(new OnClickListener(){
+			public void onClick(View v){
+				mGLView.nativeKey( KeyEvent.KEYCODE_DPAD_LEFT, 1 );
+				mGLView.nativeKey( KeyEvent.KEYCODE_DPAD_LEFT, 0 );
+			}
+		});
+
+		btn4 = new Button(this);
+		btn4.setText(getResources().getString(R.string.button_right));
+		btn4.setOnClickListener(new OnClickListener(){
+			public void onClick(View v){
+				mGLView.nativeKey( KeyEvent.KEYCODE_DPAD_RIGHT, 1 );
+				mGLView.nativeKey( KeyEvent.KEYCODE_DPAD_RIGHT, 0 );
+			}
+		});
+
+		btn5 = new Button(this);
+		btn5.setText(getResources().getString(R.string.button_up));
+		btn5.setOnClickListener(new OnClickListener(){
 			public void onClick(View v){
 				mGLView.nativeKey( KeyEvent.KEYCODE_DPAD_UP, 1 );
 				mGLView.nativeKey( KeyEvent.KEYCODE_DPAD_UP, 0 );
 			}
 		});
 
-		btn4 = new Button(this);
-		btn4.setText(getResources().getString(R.string.button_down));
-		btn4.setOnClickListener(new OnClickListener(){
+		btn6 = new Button(this);
+		btn6.setText(getResources().getString(R.string.button_down));
+		btn6.setOnClickListener(new OnClickListener(){
 			public void onClick(View v){
 				mGLView.nativeKey( KeyEvent.KEYCODE_DPAD_DOWN, 1 );
 				mGLView.nativeKey( KeyEvent.KEYCODE_DPAD_DOWN, 0 );
 			}
 		});
 
-		btn5 = new Button(this); // dummy button for Android 1.6
-		btn5.setVisibility(View.INVISIBLE);
-		btn6 = new Button(this); // dummy button for Android 1.6
-		btn6.setVisibility(View.INVISIBLE);
+		btn7 = new Button(this); // dummy button for Android 1.6
+		btn7.setVisibility(View.INVISIBLE);
+		btn8 = new Button(this); // dummy button for Android 1.6
+		btn8.setVisibility(View.INVISIBLE);
 
 		layout  = new LinearLayout(this);
 		layout1 = new LinearLayout(this);
@@ -434,7 +466,7 @@ public class ONScripter extends Activity implements AdapterView.OnItemClickListe
 		else
 			layout.setOrientation(LinearLayout.VERTICAL);
 
-		layout1.addView(btn5);
+		layout1.addView(btn7);
 		layout.addView(layout1, 0);
 
 		layout.addView(mGLView, 1, new LinearLayout.LayoutParams(screen_w, screen_h));
@@ -442,9 +474,11 @@ public class ONScripter extends Activity implements AdapterView.OnItemClickListe
 		layout2.addView(btn2, 1);
 		layout2.addView(btn3, 2);
 		layout2.addView(btn4, 3);
+		layout2.addView(btn5, 4);
+		layout2.addView(btn6, 5);
 		layout.addView(layout2, 2);
 
-		layout3.addView(btn6);
+		layout3.addView(btn8);
 		layout.addView(layout3, 3);
 
 		resetLayout();
@@ -468,20 +502,20 @@ public class ONScripter extends Activity implements AdapterView.OnItemClickListe
 		int w1 = 0, h1 = 0;
 		int w2 = dw, h2 = dh;
 		if (mIsLandscape == true){
-			if (mScreenCentered){
+			if (!mButtonVisible){
 				w1 = bw - bw/2;
 				bw /= 2;
 			}
-			if (bw > bh*4/3) bw = bh*4/3;
+			if (bw > bh*2) bw = bh*2;
 			h1 = dh;
 			w2 = bw;
 		}
 		else{
-			if (mScreenCentered){
+			if (!mButtonVisible){
 				h1 = bh - bh/2;
 				bh /= 2;
 			}
-			if (bh > bw*3/4) bh = bw*3/4;
+			if (bh > bw*2) bh = bw*2;
 			w1 = dw;
 			h2 = bh;
 		}
@@ -505,6 +539,16 @@ public class ONScripter extends Activity implements AdapterView.OnItemClickListe
 		btn4.setMinHeight(bh);
 		btn4.setWidth(bw);
 		btn4.setHeight(bh);
+
+		btn5.setMinWidth(bw);
+		btn5.setMinHeight(bh);
+		btn5.setWidth(bw);
+		btn5.setHeight(bh);
+
+		btn6.setMinWidth(bw);
+		btn6.setMinHeight(bh);
+		btn6.setWidth(bw);
+		btn6.setHeight(bh);
 
 		if (mButtonVisible) layout2.setVisibility(View.VISIBLE);
 		else                layout2.setVisibility(View.INVISIBLE);
@@ -545,7 +589,6 @@ public class ONScripter extends Activity implements AdapterView.OnItemClickListe
 
 		SharedPreferences sp = getSharedPreferences("pref", MODE_PRIVATE);
 		mButtonVisible = sp.getBoolean("button_visible", getResources().getBoolean(R.bool.button_visible));
-		mScreenCentered = sp.getBoolean("screen_centered", getResources().getBoolean(R.bool.screen_centered));
 
 		if (getResources().getBoolean(R.bool.use_launcher)){
 			gCurrentDirectoryPath = Environment.getExternalStorageDirectory() + "/ons";
@@ -574,13 +617,8 @@ public class ONScripter extends Activity implements AdapterView.OnItemClickListe
 			else
 				sm.add(Menu.NONE, Menu.FIRST+3, 0, getResources().getString(R.string.menu_show_buttons));
 
-			if (mScreenCentered)
-				sm.add(Menu.NONE, Menu.FIRST+5, 0, getResources().getString(R.string.menu_topleft));
-			else
-				sm.add(Menu.NONE, Menu.FIRST+6, 0, getResources().getString(R.string.menu_center));
-
-			sm.add(Menu.NONE, Menu.FIRST+7, 0, getResources().getString(R.string.menu_version));
-			menu.add(Menu.NONE, Menu.FIRST+8, 0, getResources().getString(R.string.menu_quit));
+			sm.add(Menu.NONE, Menu.FIRST+5, 0, getResources().getString(R.string.menu_version));
+			menu.add(Menu.NONE, Menu.FIRST+6, 0, getResources().getString(R.string.menu_quit));
 		}
 
 		return true;
@@ -605,12 +643,6 @@ public class ONScripter extends Activity implements AdapterView.OnItemClickListe
 			mButtonVisible = false;
 			resetLayout();
 		} else if (item.getItemId() == Menu.FIRST+5){
-			mScreenCentered = false;
-			resetLayout();
-		} else if (item.getItemId() == Menu.FIRST+6){
-			mScreenCentered = true;
-			resetLayout();
-		} else if (item.getItemId() == Menu.FIRST+7){
 			alertDialogBuilder.setTitle(getResources().getString(R.string.menu_version));
 			alertDialogBuilder.setMessage(getResources().getString(R.string.version));
 			alertDialogBuilder.setPositiveButton("OK", new DialogInterface.OnClickListener(){
@@ -620,7 +652,7 @@ public class ONScripter extends Activity implements AdapterView.OnItemClickListe
 			});
 			AlertDialog alertDialog = alertDialogBuilder.create();
 			alertDialog.show();
-		} else if (item.getItemId() == Menu.FIRST+8){
+		} else if (item.getItemId() == Menu.FIRST+6){
 			mGLView.nativeKey( KeyEvent.KEYCODE_MENU, 2 ); // send SDL_QUIT
 		} else{
 			return false;
@@ -628,7 +660,6 @@ public class ONScripter extends Activity implements AdapterView.OnItemClickListe
 
 		Editor e = getSharedPreferences("pref", MODE_PRIVATE).edit();
 		e.putBoolean("button_visible", mButtonVisible);
-		e.putBoolean("screen_centered", mScreenCentered);
 		e.commit();
 
 		return true;
