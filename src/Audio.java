@@ -32,6 +32,10 @@ class AudioThread {
 	
 	public int fillBuffer()
 	{
+		while (mAudio.getPlayState() == mAudio.PLAYSTATE_PAUSED)
+			try{
+				Thread.currentThread().sleep(500);
+			} catch(Exception e){};
 		mAudio.write( mAudioBuffer, 0, mAudioBuffer.length );
 		return 1;
 	}
@@ -87,12 +91,12 @@ class AudioThread {
 	
 	public void onPause() {
 		if( mAudio != null )
-			mAudio.setStereoVolume(0.0f, 0.0f);
+			mAudio.pause();
 	}
 
 	public void onResume() {
 		if( mAudio != null )
-			mAudio.setStereoVolume(1.0f, 1.0f);
+			mAudio.play();
 	}
 
 	private native int nativeAudioInitJavaCallbacks();
