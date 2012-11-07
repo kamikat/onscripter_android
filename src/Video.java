@@ -25,7 +25,13 @@ class DemoRenderer extends GLSurfaceView_SDL.Renderer {
 	public DemoRenderer(Activity _context)
 	{
 		context = _context;
-		nativeInit(ONScripter.gCurrentDirectoryPath, true, ONScripter.gDisableRescale);
+		int n = 1;
+		if (ONScripter.gRenderFontOutline) n++;
+		String[] arg = new String[n];
+		n = 0;
+		arg[n++] = "--open-only";
+		if (ONScripter.gRenderFontOutline) arg[n++] = "--render-font-outline";
+		nativeInit(ONScripter.gCurrentDirectoryPath, arg);
 	}
 	
 	public void onSurfaceCreated(GL10 gl, EGLConfig config) {
@@ -48,7 +54,12 @@ class DemoRenderer extends GLSurfaceView_SDL.Renderer {
 		nativeInitJavaCallbacks();
 
         // Calls main() and never returns, hehe - we'll call eglSwapBuffers() from native code
-		nativeInit(ONScripter.gCurrentDirectoryPath, false, ONScripter.gDisableRescale);
+		int n = 0;
+		if (ONScripter.gRenderFontOutline) n++;
+		String[] arg = new String[n];
+		n = 0;
+		if (ONScripter.gRenderFontOutline) arg[n++] = "--render-font-outline";
+		nativeInit(ONScripter.gCurrentDirectoryPath, arg);
 
 	}
 
@@ -62,7 +73,7 @@ class DemoRenderer extends GLSurfaceView_SDL.Renderer {
 	};
 
 	private native void nativeInitJavaCallbacks();
-	private native void nativeInit(String currentDirectoryPath, boolean oo, boolean dr);
+	private native void nativeInit(String currentDirectoryPath, String[] arg);
 	private native void nativeResize(int w, int h);
 	private native void nativeDone();
 

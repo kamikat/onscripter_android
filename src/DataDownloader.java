@@ -115,7 +115,7 @@ public class DataDownloader extends Thread
 				retry++;
 				continue;
 			} catch (IOException e) {
-				sendMessage(-2, 0, "Failed to fetch zip file: " + e.toString());
+				sendMessage(-2, 0, "Timeout or zip file is not found: " + e.toString());
 				return -1;
 			};
 
@@ -123,7 +123,7 @@ public class DataDownloader extends Thread
 				(response.getStatusLine().getStatusCode() != HttpStatus.SC_OK &&
 				response.getStatusLine().getStatusCode() != HttpStatus.SC_PARTIAL_CONTENT)){
 				response = null;
-				sendMessage(-2, 0, "Failed to fetch zip file.");
+				sendMessage(-2, 0, "Timeout or zip file is not found.");
 				return -1;
 			}
 

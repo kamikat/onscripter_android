@@ -119,24 +119,12 @@ public class ONScripter extends Activity implements AdapterView.OnItemClickListe
 		
         listView = new ListView(this);
 
-		LinearLayout layoutH = new LinearLayout(this);
-
-        checkDR = new CheckBox(this);
-        checkDR.setText("Disable rescale");
-        checkDR.setBackgroundColor(Color.rgb(244,244,255));
-        checkDR.setTextColor(Color.BLACK);
-        layoutH.addView(checkDR, new LinearLayout.LayoutParams(LinearLayout.LayoutParams.FILL_PARENT, LinearLayout.LayoutParams.FILL_PARENT, 1.0f));
-
-        listView.addHeaderView(layoutH, null, false);
-
         setupDirectorySelector();
     
         setContentView(listView);
     }
 	
 	public void onItemClick(AdapterView<?> parent, View v, int position, long id) {
-        position--; // for header
-
         TextView textView = (TextView)v;
         mOldCurrentDirectory = mCurrentDirectory;
 
@@ -186,7 +174,6 @@ public class ONScripter extends Activity implements AdapterView.OnItemClickListe
                 setupDirectorySelector();
             }
             else{
-                gDisableRescale = checkDR.isChecked();
                 runSDLApp();
             }
         }
@@ -197,6 +184,7 @@ public class ONScripter extends Activity implements AdapterView.OnItemClickListe
 		File file = new File(gCurrentDirectoryPath + "/" + version_filename);
 		if (file.exists() == false){
 			progDialog = new ProgressDialog(this);
+			progDialog.setCanceledOnTouchOutside(false);
 			progDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
 			progDialog.setMessage("Downloading archives from Internet:");
 			progDialog.setOnKeyListener(new OnKeyListener(){
@@ -273,6 +261,7 @@ public class ONScripter extends Activity implements AdapterView.OnItemClickListe
 		File file = new File(gCurrentDirectoryPath + "/" + getResources().getString(R.string.download_version));
 		if (file.exists() == false){
 			progDialog = new ProgressDialog(this);
+			progDialog.setCanceledOnTouchOutside(false);
 			progDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
 			progDialog.setMessage("Copying archives: ");
 			progDialog.setOnKeyListener(new OnKeyListener(){
@@ -589,6 +578,7 @@ public class ONScripter extends Activity implements AdapterView.OnItemClickListe
 
 		SharedPreferences sp = getSharedPreferences("pref", MODE_PRIVATE);
 		mButtonVisible = sp.getBoolean("button_visible", getResources().getBoolean(R.bool.button_visible));
+		gRenderFontOutline = sp.getBoolean("render_font_outline", getResources().getBoolean(R.bool.render_font_outline));
 
 		if (getResources().getBoolean(R.bool.use_launcher)){
 			gCurrentDirectoryPath = Environment.getExternalStorageDirectory() + "/ons";
@@ -757,9 +747,7 @@ public class ONScripter extends Activity implements AdapterView.OnItemClickListe
 	private AudioThread mAudioThread = null;
 	private PowerManager.WakeLock wakeLock = null;
 	public static String gCurrentDirectoryPath;
-	public static Boolean gDisableRescale = false;
-	public static Boolean gWideScreen = false;
-	public static CheckBox checkDR = null;
+	public static boolean gRenderFontOutline;
 	private native int nativeInitJavaCallbacks();
 	private native int nativeGetWidth();
 	private native int nativeGetHeight();
