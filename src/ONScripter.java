@@ -41,6 +41,7 @@ import android.widget.ListView;
 import android.widget.ArrayAdapter;
 import android.widget.AdapterView;
 import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.util.Log;
@@ -119,12 +120,33 @@ public class ONScripter extends Activity implements AdapterView.OnItemClickListe
 		
         listView = new ListView(this);
 
+        LinearLayout layoutH = new LinearLayout(this);
+
+        checkRFO = new CheckBox(this);
+        checkRFO.setText("Render Font Outline");
+        checkRFO.setBackgroundColor(Color.rgb(244,244,255));
+        checkRFO.setTextColor(Color.BLACK);
+        checkRFO.setChecked(gRenderFontOutline);
+        checkRFO.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener(){
+                public void onCheckedChanged(CompoundButton buttonView, boolean isChecked){
+                    Editor e = getSharedPreferences("pref", MODE_PRIVATE).edit();
+                    e.putBoolean("render_font_outline", isChecked);
+                    e.commit();
+                }
+            });
+            
+        layoutH.addView(checkRFO, new LinearLayout.LayoutParams(LinearLayout.LayoutParams.FILL_PARENT, LinearLayout.LayoutParams.FILL_PARENT, 1.0f));
+
+        listView.addHeaderView(layoutH, null, false);
+
         setupDirectorySelector();
     
         setContentView(listView);
     }
 	
 	public void onItemClick(AdapterView<?> parent, View v, int position, long id) {
+        position--; // for header
+
         TextView textView = (TextView)v;
         mOldCurrentDirectory = mCurrentDirectory;
 
@@ -174,6 +196,7 @@ public class ONScripter extends Activity implements AdapterView.OnItemClickListe
                 setupDirectorySelector();
             }
             else{
+                gRenderFontOutline = checkRFO.isChecked();
                 runSDLApp();
             }
         }
@@ -748,6 +771,7 @@ public class ONScripter extends Activity implements AdapterView.OnItemClickListe
 	private PowerManager.WakeLock wakeLock = null;
 	public static String gCurrentDirectoryPath;
 	public static boolean gRenderFontOutline;
+	public static CheckBox checkRFO = null;
 	private native int nativeInitJavaCallbacks();
 	private native int nativeGetWidth();
 	private native int nativeGetHeight();
@@ -760,6 +784,7 @@ public class ONScripter extends Activity implements AdapterView.OnItemClickListe
 		System.loadLibrary("mad");
 		System.loadLibrary("bz2");
 		System.loadLibrary("tremor");
+		System.loadLibrary("lua");
 		System.loadLibrary("sdl");
 		System.loadLibrary("sdl_mixer");
 		System.loadLibrary("sdl_image");

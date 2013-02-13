@@ -12,23 +12,25 @@ LOCAL_C_INCLUDES := $(LOCAL_PATH)/$(APP_SUBDIR) \
 	$(LOCAL_PATH)/../sdl_mixer \
 	$(LOCAL_PATH)/../sdl_image \
 	$(LOCAL_PATH)/../sdl_ttf \
+	$(LOCAL_PATH)/../lua/src \
+	$(LOCAL_PATH)/../lua/etc \
 	$(LOCAL_PATH)/../bzip2-1.0.5 \
 	$(LOCAL_PATH)/../libmad-0.15.1b \
 	$(LOCAL_PATH)/../tremor
 
 LOCAL_CFLAGS := $(LOCAL_C_INCLUDES:%=-I%) \
 	-DSDL_JAVA_PACKAGE_PATH=$(SDL_JAVA_PACKAGE_PATH) \
-	-DLINUX -DMP3_MAD -DPDA_AUTOSIZE -DUSE_OGG_VORBIS -DINTEGER_OGG_VORBIS -DUTF8_FILESYSTEM
+	-DLINUX -DMP3_MAD -DPDA_AUTOSIZE -DUSE_OGG_VORBIS -DINTEGER_OGG_VORBIS -DUTF8_FILESYSTEM -DUSE_LUA
 
 #Change C++ file extension as appropriate
 LOCAL_CPP_EXTENSION := .cpp
 
 OBJSUFFIX := .o
-EXT_OBJS = 
+EXT_OBJS = LUAHandler.o
 include $(LOCAL_PATH)/$(APP_SUBDIR)/Makefile.onscripter
 LOCAL_SRC_FILES := $(addprefix $(APP_SUBDIR)/,$(patsubst %.o, %.cpp, $(ONSCRIPTER_OBJS)))
 
-LOCAL_SHARED_LIBRARIES := sdl sdl_mixer sdl_image sdl_ttf bz2 mad tremor
+LOCAL_SHARED_LIBRARIES := sdl sdl_mixer sdl_image sdl_ttf lua bz2 mad tremor
 
 LOCAL_LDLIBS := -lGLESv1_CM -ldl -llog -lz -lGLESv1_CM
 
